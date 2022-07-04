@@ -14,10 +14,10 @@ I recommended you build a Docker image using the supplied `Dockerfile`:
 docker build . -t sabnzbd-sanitizer
 ```
 
-You can then start up a container:
+You can then start a container in the background:
 
 ```
-docker run -it --rm \
+docker run -d --rm \
   -e API_URL=http://your.ip.address.here:8080/api \
   -e API_KEY=your_sabnzbd_api_key \
   -e CATEGORIES=yyy \
