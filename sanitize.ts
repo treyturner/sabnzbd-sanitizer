@@ -7,14 +7,15 @@ if (!process.env.CATEGORIES || !process.env.API_URL || !process.env.API_KEY) {
   process.exit(1)
 }
 
-const maxPollRateRaw = parseInt(process.env.POLL_RATE_SECS || '')
+const maxPollSecsRaw = parseInt(process.env.MAX_POLL_SECS || '')
 export const config = {
   categories: process.env.CATEGORIES.split(',').map(c => c.trim().toLowerCase()),
   apiUrl: process.env.API_URL,
   apiKey: process.env.API_KEY,
-  maxPollRate: Number.isInteger(maxPollRateRaw) ? maxPollRateRaw : 300,
+  maxPollSecs: Number.isInteger(maxPollSecsRaw) ? maxPollSecsRaw : 300,
+  clearWarnings: process.env.CLEAR_WARNINGS === 'false' ? false : true
 }
-let pollRate = 1
+let pollSecs = 1
 let lastHistoryUpdate: number
 
 export type Item = {
@@ -33,11 +34,14 @@ export type GetHistoryParamsObj = {
 }
 
 async function sanitize() {
-  let actionTaken = await sanitizeWarnings()
+  let actionTaken = false
+  if (config.clearWarnings) {
+    actionTaken = await sanitizeWarnings()
+  }
   actionTaken = await sanitizeHistory() || actionTaken
-  adjustPollTime(actionTaken)
+  adjustPollSecs(actionTaken)
   // console.log(`Sleeping ${pollRate} second${pluralize(pollRate)}...`)
-  setTimeout(sanitize, pollRate * 1000)
+  setTimeout(sanitize, pollSecs * 1000)
 }
 
 async function sanitizeWarnings() {
@@ -73,15 +77,15 @@ async function sanitizeHistory() {
   return false
 }
 
-function adjustPollTime(actionTaken: boolean) {
+function adjustPollSecs(actionTaken: boolean) {
   if (actionTaken) {
-    pollRate = 5    
+    pollSecs = 5    
   } else {
     // console.log(`No action necessary.`)
-    if (pollRate * 2 <= config.maxPollRate) {
-      pollRate *= 2
+    if (pollSecs * 2 <= config.maxPollSecs) {
+      pollSecs *= 2
     } else {
-      pollRate = config.maxPollRate      
+      pollSecs = config.maxPollSecs      
     }
   }
 }
