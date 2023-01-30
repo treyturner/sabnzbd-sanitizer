@@ -21,7 +21,7 @@ let lastHistoryUpdate: number
 export type Item = {
   category: string;
   nzo_id: string;
-  loaded: boolean;
+  status: string;
 }
 
 export type GetHistoryParamsObj = {
@@ -63,7 +63,7 @@ async function sanitizeHistory() {
   const history: {slots: Item[], last_history_update: number} = await api.getHistory({lastHistoryUpdate: lastHistoryUpdate})
   if (typeof history === 'object' && history !== null && history.slots.length > 0) {
     lastHistoryUpdate = history.last_history_update
-    const items = history.slots.filter(i => config.categories.includes(i.category) && !i.loaded)
+    const items = history.slots.filter(i => config.categories.includes(i.category) && ['Completed', 'Failed'].includes(i.status));
     if (items.length > 0) {
       const result = await api.removeHistoryItems(items)
       if (result) {
