@@ -21,4 +21,4 @@ jobs:
       - name: Build and tag
         run: docker build . --file Dockerfile --tag $DOCKERHUB_USERNAME/$PROJECT_NAME:latest --tag $DOCKERHUB_USERNAME/$PROJECT_NAME:${{ github.run_id }}.${{ github.run_number }}.${{ github.run_attempt }}
       - name: Publish
-        run: docker push ${{secrets.DOCKERHUB_USERNAME}}/sabnzbd-sanitizer
+        run: docker push --all-tags ${{secrets.DOCKERHUB_USERNAME}}/sabnzbd-sanitizer
