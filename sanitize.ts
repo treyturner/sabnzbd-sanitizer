@@ -47,15 +47,17 @@ async function sanitize() {
 async function sanitizeWarnings() {
   const warnings: {text: string}[] = await api.getWarnings()
   let clearedWarnings = false
-  for (const warning of warnings) {
-    for (const category of config.categories) {
-      if (warning.text.toLowerCase().includes(category)) {
-        clearedWarnings = true
-        console.log(`Clearing warnings...`)
-        await api.clearAllWarnings()
+  if (warnings.length) {
+    for (const warning of warnings) {
+      for (const category of config.categories) {
+        if (warning.text.toLowerCase().includes(category)) {
+          clearedWarnings = true
+          console.log(`Clearing warnings...`)
+          await api.clearAllWarnings()
+        }
       }
     }
-  }
+  }  
   return clearedWarnings
 }
 
