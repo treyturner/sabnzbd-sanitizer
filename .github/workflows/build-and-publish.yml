@@ -1,0 +1,25 @@
+name: Build and publish
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v3
+      - name: DockerHub login
+        env:
+          DOCKERHUB_USERNAME: ${{secrets.DOCKERHUB_USERNAME}}
+          DOCKERHUB_TOKEN: ${{secrets.DOCKERHUB_TOKEN}}
+          PROJECT_NAME: sabnzbd-sanitizer
+        run: |
+          docker login -u $DOCKERHUB_USERNAME -p $DOCKERHUB_TOKEN
+      - name: Build and tag
+        run: docker build . --file Dockerfile --tag $DOCKERHUB_USERNAME/$PROJECT_NAME:latest --tag $DOCKERHUB_USERNAME/$PROJECT_NAME:${{ github.run_id }}.${{ github.run_number }}.${{ github.run_attempt }}
+      - name: Publish
+        run: docker push ${{secrets.DOCKERHUB_USERNAME}}/sabnzbd-sanitizer
