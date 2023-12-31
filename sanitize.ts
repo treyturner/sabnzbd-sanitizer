@@ -25,7 +25,7 @@ let lastHistoryUpdate: number;
 export type Item = {
   category: string;
   nzo_id: string;
-  filename: string;
+  name: string;
   status: string;
 };
 
@@ -85,7 +85,7 @@ async function sanitizeHistory() {
     const filterFn = (i: Item) => {
       ['Completed', 'Failed'].includes(i.status) &&
         (config.categories.includes(i.category) ||
-          config.categories.some((c) => i.filename.toLowerCase().includes(c)));
+          config.categories.some((c) => i.name.toLowerCase().includes(c)));
     };
     const items = history.slots.filter((i) => filterFn(i));
     if (items.length) {
