@@ -1,9 +1,17 @@
-import axios from 'axios'
-import { config, GetHistoryParamsObj, Item } from './sanitize'
+import axios from 'axios';
+import { config, GetHistoryParamsObj, Item } from './sanitize';
+import { logError } from './util';
 
-export function getHistory({start, limit, cat, search, nzoIds, lastHistoryUpdate}: GetHistoryParamsObj={}) {
-  return axios
-    .get(config.apiUrl, {
+export async function getHistory({
+  start,
+  limit,
+  cat,
+  search,
+  nzoIds,
+  lastHistoryUpdate,
+}: GetHistoryParamsObj = {}) {
+  try {
+    const res = await axios.get(config.apiUrl, {
       params: {
         mode: 'history',
         start: start,
@@ -12,65 +20,53 @@ export function getHistory({start, limit, cat, search, nzoIds, lastHistoryUpdate
         search: search,
         nzo_ids: nzoIds?.join() !== '' ? nzoIds?.join() : undefined,
         last_history_update: lastHistoryUpdate || 0,
-      }
-    })
-    .then(res => {
-      return res.data.history
-    })
-    .catch(err => {
-      console.error('Error getting history:')
-      console.error(err.toJSON())
-    })
+      },
+    });
+    return res.data.history;
+  } catch (err) {
+    await logError('Error getting history', err);
+  }
 }
 
-export function removeHistoryItems(items: Item[]) {
-  return axios
-    .get(config.apiUrl, {
+export async function removeHistoryItems(items: Item[]) {
+  try {
+    const res = await axios.get(config.apiUrl, {
       params: {
         mode: 'history',
         name: 'delete',
-        value: items.map(i => i.nzo_id).join(),
+        value: items.map((i) => i.nzo_id).join(),
         del_files: 1,
-      }
-    })
-    .then(res => {
-      return res.data.status
-    })
-    .catch(err => {
-      console.error('Error deleting history items:')
-      console.error(err.toJSON())
-    })
+      },
+    });
+    return res.data.status;
+  } catch (err) {
+    await logError('Error deleting history items', err);
+  }
 }
 
-export function getWarnings() {
-  return axios
-    .get(config.apiUrl, {
-      params: {
-        mode: 'warnings'
-      }
-    })
-    .then(res => {
-      return res.data.warnings
-    })
-    .catch(err => {
-      console.error('Error getting warnings:')
-      console.error(err.toJSON())
-    })
-}
-
-export function clearAllWarnings() {
-  return axios
-    .get(config.apiUrl, {
+export async function getWarnings() {
+  try {
+    const res = await axios.get(config.apiUrl, {
       params: {
         mode: 'warnings',
-        name: 'clear'
-      }
-    })
-    .then(res => {
-      return res.data
-    })
-    .catch(err => {
-      console.error('Error clearing all warnings:')
-      console.error(err.toJSON())
-    })
+      },
+    });
+    return res.data.warnings;
+  } catch (err) {
+    await logError('Error getting warnings', err);
+  }
+}
+
+export async function clearAllWarnings() {
+  try {
+    const res = await axios.get(config.apiUrl, {
+      params: {
+        mode: 'warnings',
+        name: 'clear',
+      },
+    });
+    return res.data;
+  } catch (err) {
+    await logError('Error clearing all warnings', err);
+  }
 }

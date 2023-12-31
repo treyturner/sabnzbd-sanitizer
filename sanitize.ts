@@ -1,28 +1,33 @@
-import * as api from './api'
-import axios from 'axios'
-import { pluralize } from './util'
+import * as api from './api';
+import axios from 'axios';
+import { pluralize } from './util';
 
 if (!process.env.CATEGORIES || !process.env.API_URL || !process.env.API_KEY) {
-  console.error("API_URL, API_KEY, and CATEGORIES environment variables must be defined.")
-  process.exit(1)
+  console.error(
+    'API_URL, API_KEY, and CATEGORIES environment variables must be defined.'
+  );
+  process.exit(1);
 }
 
-const maxPollSecsRaw = parseInt(process.env.MAX_POLL_SECS || '')
+const maxPollSecsRaw = parseInt(process.env.MAX_POLL_SECS || '');
 export const config = {
-  categories: process.env.CATEGORIES.split(',').map(c => c.trim().toLowerCase()),
+  categories: process.env.CATEGORIES.split(',').map((c) =>
+    c.trim().toLowerCase()
+  ),
   apiUrl: process.env.API_URL,
   apiKey: process.env.API_KEY,
   maxPollSecs: Number.isInteger(maxPollSecsRaw) ? maxPollSecsRaw : 300,
-  clearWarnings: process.env.CLEAR_WARNINGS === 'false' ? false : true
-}
-let pollSecs = 1
-let lastHistoryUpdate: number
+  clearWarnings: process.env.CLEAR_WARNINGS === 'false' ? false : true,
+};
+let pollSecs = 1;
+let lastHistoryUpdate: number;
 
 export type Item = {
   category: string;
   nzo_id: string;
+  filename: string;
   status: string;
-}
+};
 
 export type GetHistoryParamsObj = {
   start?: number;
@@ -31,63 +36,86 @@ export type GetHistoryParamsObj = {
   search?: string;
   nzoIds?: string[];
   lastHistoryUpdate?: number;
-}
+};
+
+const fmtTime = () => {
+  const d = new Date();
+  return (
+    `${d.getFullYear()}-${d.getMonth() + 1}-${d.getDate()} ` +
+    `${d.getHours()}:${d.getMinutes()}:${d.getSeconds()}`
+  );
+};
 
 async function sanitize() {
-  let actionTaken = false
+  let actionTaken = false;
   if (config.clearWarnings) {
-    actionTaken = await sanitizeWarnings()
+    actionTaken = await sanitizeWarnings();
   }
-  actionTaken = await sanitizeHistory() || actionTaken
-  adjustPollSecs(actionTaken)
-  // console.log(`Sleeping ${pollRate} second${pluralize(pollRate)}...`)
-  setTimeout(sanitize, pollSecs * 1000)
+  actionTaken = (await sanitizeHistory()) || actionTaken;
+  adjustPollSecs(actionTaken);
+  // console.log(`${fmtTime()} Sleeping ${pollRate} second${pluralize(pollRate)}...`)
+  setTimeout(sanitize, pollSecs * 1000);
 }
 
 async function sanitizeWarnings() {
-  const warnings: {text: string}[] = await api.getWarnings()
-  let clearedWarnings = false
-  if (warnings.length) {
+  const warnings: { text: string }[] = await api.getWarnings();
+  let clearedWarnings = false;
+  if (typeof warnings === 'object' && warnings.length) {
     for (const warning of warnings) {
       for (const category of config.categories) {
-        if (warning.text.toLowerCase().includes(category)) {
-          clearedWarnings = true
-          console.log(`Clearing warnings...`)
-          await api.clearAllWarnings()
+        if (
+          warning.text.toLowerCase().includes(category) ||
+          warning.text.includes('Your UNRAR version is')
+        ) {
+          clearedWarnings = true;
+          console.log(`${fmtTime()} Clearing warnings...`);
+          await api.clearAllWarnings();
         }
       }
     }
-  }  
-  return clearedWarnings
+  }
+  return clearedWarnings;
 }
 
 async function sanitizeHistory() {
-  const history: {slots: Item[], last_history_update: number} = await api.getHistory({lastHistoryUpdate: lastHistoryUpdate})
-  if (typeof history === 'object' && history !== null && history.slots.length > 0) {
-    lastHistoryUpdate = history.last_history_update
-    const items = history.slots.filter(i => config.categories.includes(i.category) && ['Completed', 'Failed'].includes(i.status));
-    if (items.length > 0) {
-      const result = await api.removeHistoryItems(items)
+  const history: { slots: Item[]; last_history_update: number } =
+    await api.getHistory({ lastHistoryUpdate: lastHistoryUpdate });
+  if (typeof history === 'object' && history !== null && history.slots.length) {
+    lastHistoryUpdate = history.last_history_update;
+    const filterFn = (i: Item) => {
+      ['Completed', 'Failed'].includes(i.status) &&
+        (config.categories.includes(i.category) ||
+          config.categories.some((c) => i.filename.toLowerCase().includes(c)));
+    };
+    const items = history.slots.filter((i) => filterFn(i));
+    if (items.length) {
+      const result = await api.removeHistoryItems(items);
       if (result) {
-        console.log(`Sanitized ${items.length} item${pluralize(items)}.`)
+        console.log(
+          `${fmtTime()} Sanitized ${items.length} item${pluralize(items)}.`
+        );
       } else {
-        console.log(`Something went wrong trying to sanitize ${items.length} items.`)
+        console.log(
+          `${fmtTime()} Something went wrong trying to sanitize ${
+            items.length
+          } items.`
+        );
       }
     }
-    return items.length > 0
+    return items.length > 0;
   }
-  return false
+  return false;
 }
 
 function adjustPollSecs(actionTaken: boolean) {
   if (actionTaken) {
-    pollSecs = 5    
+    pollSecs = 5;
   } else {
-    // console.log(`No action necessary.`)
+    // console.log(`${fmtTime()} No action necessary.`)
     if (pollSecs * 2 <= config.maxPollSecs) {
-      pollSecs *= 2
+      pollSecs *= 2;
     } else {
-      pollSecs = config.maxPollSecs      
+      pollSecs = config.maxPollSecs;
     }
   }
 }
@@ -95,7 +123,7 @@ function adjustPollSecs(actionTaken: boolean) {
 axios.defaults.params = {
   apikey: config.apiKey,
   output: 'json',
-}
+};
 
-console.info(`sabnzbd-sanitizer initialized.`)
-sanitize()
+console.info(`${fmtTime()} sabnzbd-sanitizer initialized.`);
+sanitize();
