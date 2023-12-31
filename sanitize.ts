@@ -83,9 +83,11 @@ async function sanitizeHistory() {
   if (typeof history === 'object' && history !== null && history.slots.length) {
     lastHistoryUpdate = history.last_history_update;
     const filterFn = (i: Item) => {
-      ['Completed', 'Failed'].includes(i.status) &&
+      return (
+        ['Completed', 'Failed'].includes(i.status) &&
         (config.categories.includes(i.category) ||
-          config.categories.some((c) => i.name.toLowerCase().includes(c)));
+          config.categories.some((c) => i.name.toLowerCase().includes(c)))
+      );
     };
     const items = history.slots.filter((i) => filterFn(i));
     if (items.length) {
