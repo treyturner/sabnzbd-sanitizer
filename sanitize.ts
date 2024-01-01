@@ -65,17 +65,18 @@ async function sanitizeWarnings() {
   const warnings: { text: string }[] = await api.getWarnings();
   let clearedWarnings = false;
   if (typeof warnings === 'object' && warnings.length) {
-    for (const warning of warnings) {
-      for (const category of config.categories) {
-        if (
-          warning.text.toLowerCase().includes(category) ||
-          warning.text.includes('Your UNRAR version is')
-        ) {
-          clearedWarnings = true;
-          console.log(`${fmtTime()} Clearing warnings...`);
-          await api.clearAllWarnings();
-        }
-      }
+    if (
+      config.categories.some((category) =>
+        warnings.some(
+          (warning) =>
+            warning.text.toLowerCase().includes(category) ||
+            warning.text.includes('Your UNRAR version is')
+        )
+      )
+    ) {
+      clearedWarnings = true;
+      console.log(`${fmtTime()} Clearing warnings...`);
+      await api.clearAllWarnings();
     }
   }
   return clearedWarnings;
