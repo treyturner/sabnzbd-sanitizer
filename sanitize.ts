@@ -76,7 +76,9 @@ async function sanitizeWarnings() {
     ) {
       clearedWarnings = true;
       await api.clearAllWarnings();
-      console.log(`${fmtTime()} Cleared ${warnings.length} warnings.`);
+      console.log(
+        `${fmtTime()} Cleared ${warnings.length} warning${pluralize(warnings)}.`
+      );
     }
   }
   return clearedWarnings;
