@@ -1,6 +1,6 @@
 import * as api from './api';
 import axios from 'axios';
-import { pluralize } from './util';
+import { pad, pluralize } from './util';
 
 if (!process.env.CATEGORIES || !process.env.API_URL || !process.env.API_KEY) {
   console.error(
@@ -41,8 +41,12 @@ export type GetHistoryParamsObj = {
 const fmtTime = () => {
   const d = new Date();
   return (
-    `${d.getFullYear()}-${d.getMonth() + 1}-${d.getDate()} ` +
-    `${d.getHours()}:${d.getMinutes()}:${d.getSeconds()}`
+    `${d.getFullYear()}-` +
+    `${pad(d.getMonth() + 1)}-` +
+    `${pad(d.getDate())} ` +
+    `${pad(d.getHours())}:` +
+    `${pad(d.getMinutes())}:` +
+    `${pad(d.getSeconds())}`
   );
 };
 
@@ -114,8 +118,8 @@ function adjustPollSecs(actionTaken: boolean) {
     pollSecs = 5;
   } else {
     // console.log(`${fmtTime()} No action necessary.`)
-    if (pollSecs * 2 <= config.maxPollSecs) {
-      pollSecs *= 2;
+    if (pollSecs + 5 <= config.maxPollSecs) {
+      pollSecs += 5;
     } else {
       pollSecs = config.maxPollSecs;
     }

@@ -16,3 +16,7 @@ export async function logError(description: string, err: unknown) {
     }
   } catch {}
 }
+
+export function pad(i: number) {
+  return i.toString().padStart(2, '0');
+}
