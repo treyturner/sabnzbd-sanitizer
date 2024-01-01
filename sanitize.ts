@@ -16,7 +16,7 @@ export const config = {
   ),
   apiUrl: process.env.API_URL,
   apiKey: process.env.API_KEY,
-  maxPollSecs: Number.isInteger(maxPollSecsRaw) ? maxPollSecsRaw : 300,
+  maxPollSecs: Number.isInteger(maxPollSecsRaw) ? maxPollSecsRaw : 120,
   clearWarnings: process.env.CLEAR_WARNINGS === 'false' ? false : true,
 };
 let pollSecs = 1;
