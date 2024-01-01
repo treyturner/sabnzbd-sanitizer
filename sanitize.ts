@@ -75,8 +75,8 @@ async function sanitizeWarnings() {
       )
     ) {
       clearedWarnings = true;
-      console.log(`${fmtTime()} Clearing warnings...`);
       await api.clearAllWarnings();
+      console.log(`${fmtTime()} Cleared ${warnings.length} warnings.`);
     }
   }
   return clearedWarnings;
@@ -99,7 +99,9 @@ async function sanitizeHistory() {
       const result = await api.removeHistoryItems(items);
       if (result) {
         console.log(
-          `${fmtTime()} Sanitized ${items.length} item${pluralize(items)}.`
+          `${fmtTime()} Sanitized ${items.length} history item${pluralize(
+            items
+          )}.`
         );
       } else {
         console.log(
