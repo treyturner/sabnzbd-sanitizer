@@ -17,7 +17,8 @@ export const config = {
   apiUrl: process.env.API_URL,
   apiKey: process.env.API_KEY,
   maxPollSecs: Number.isInteger(maxPollSecsRaw) ? maxPollSecsRaw : 120,
-  clearWarnings: process.env.CLEAR_WARNINGS === 'false' ? false : true,
+  clearWarnings: process.env.CLEAR_WARNINGS !== 'false',
+  logNames: process.env.LOG_NAMES === 'true',
 };
 let pollSecs = 1;
 let lastHistoryUpdate: number;
@@ -57,7 +58,6 @@ async function sanitize() {
   }
   actionTaken = (await sanitizeHistory()) || actionTaken;
   adjustPollSecs(actionTaken);
-  // console.log(`${fmtTime()} Sleeping ${pollRate} second${pluralize(pollRate)}...`)
   setTimeout(sanitize, pollSecs * 1000);
 }
 
@@ -100,11 +100,19 @@ async function sanitizeHistory() {
     if (items.length) {
       const result = await api.removeHistoryItems(items);
       if (result) {
-        console.log(
-          `${fmtTime()} Sanitized ${items.length} history item${pluralize(
-            items
-          )}:\n${JSON.stringify(items, null, 2)}`
-        );
+        let logMsg = `${fmtTime()} Sanitized ${
+          items.length
+        } history item${pluralize(items)}`;
+        if (config.logNames) {
+          logMsg += `: ${JSON.stringify(
+            items.map((i) => `${i.category}: ${i.name}`),
+            null,
+            2
+          )}`;
+        } else {
+          logMsg += '.';
+        }
+        console.log(logMsg);
       } else {
         console.log(
           `${fmtTime()} Something went wrong trying to sanitize ${
@@ -122,7 +130,6 @@ function adjustPollSecs(actionTaken: boolean) {
   if (actionTaken) {
     pollSecs = 5;
   } else {
-    // console.log(`${fmtTime()} No action necessary.`)
     if (pollSecs + 5 <= config.maxPollSecs) {
       pollSecs += 5;
     } else {
@@ -136,5 +143,11 @@ axios.defaults.params = {
   output: 'json',
 };
 
-console.info(`${fmtTime()} sabnzbd-sanitizer initialized.`);
+console.info(
+  `${fmtTime()} sabnzbd-sanitizer initialized with config: ${JSON.stringify(
+    config,
+    null,
+    2
+  )}`
+);
 sanitize();

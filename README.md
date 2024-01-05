@@ -17,6 +17,7 @@ Requires setting environment variables for which a default is not supplied.
 | `CATEGORIES`         | A comma-separated list of categories to purge from history | `movies,music`                     | No default |
 | `MAX_POLL_SECS`      | Max number of seconds between checks                       | `60`                               | `300`      |
 | `CLEAR_WARNINGS`     | Clear all warnings if any contain the name of a category   | `false`                            | `true`     |
+| `LOG_NAMES`          | Optionally log NZB names for debugging                     | `true`                             | `false`    |
 
 ## Usage
 
