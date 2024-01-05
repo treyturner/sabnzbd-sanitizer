@@ -103,7 +103,7 @@ async function sanitizeHistory() {
         console.log(
           `${fmtTime()} Sanitized ${items.length} history item${pluralize(
             items
-          )}.`
+          )}:\n${JSON.stringify(items, null, 2)}`
         );
       } else {
         console.log(
