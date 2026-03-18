@@ -145,7 +145,7 @@ axios.defaults.params = {
 
 console.info(
   `${fmtTime()} sabnzbd-sanitizer initialized with config: ${JSON.stringify(
-    config,
+    { ...config, apiKey: '***' },
     null,
     2
   )}`
