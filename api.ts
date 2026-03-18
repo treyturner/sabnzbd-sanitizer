@@ -24,7 +24,7 @@ export async function getHistory({
     });
     return res.data.history;
   } catch (err) {
-    await logError('Error getting history', err);
+    logError('Error getting history', err);
   }
 }
 
@@ -40,7 +40,7 @@ export async function removeHistoryItems(items: Item[]) {
     });
     return res.data.status;
   } catch (err) {
-    await logError('Error deleting history items', err);
+    logError('Error deleting history items', err);
   }
 }
 
@@ -53,7 +53,7 @@ export async function getWarnings() {
     });
     return res.data.warnings;
   } catch (err) {
-    await logError('Error getting warnings', err);
+    logError('Error getting warnings', err);
   }
 }
 
@@ -67,6 +67,6 @@ export async function clearAllWarnings() {
     });
     return res.data;
   } catch (err) {
-    await logError('Error clearing all warnings', err);
+    logError('Error clearing all warnings', err);
   }
 }
