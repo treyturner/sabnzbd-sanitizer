@@ -1,6 +1,6 @@
 import axios from 'axios';
-import { config, GetHistoryParamsObj, Item } from './sanitize';
-import { logError } from './util';
+import { config, GetHistoryParamsObj, Item } from './sanitize.js';
+import { logError } from './util.js';
 
 export async function getHistory({
   start,
