@@ -25,6 +25,7 @@ export async function getHistory({
     return res.data.history;
   } catch (err) {
     logError('Error getting history', err);
+    return null;
   }
 }
 
@@ -41,6 +42,7 @@ export async function removeHistoryItems(items: Item[]) {
     return res.data.status;
   } catch (err) {
     logError('Error deleting history items', err);
+    return null;
   }
 }
 
@@ -54,6 +56,7 @@ export async function getWarnings() {
     return res.data.warnings;
   } catch (err) {
     logError('Error getting warnings', err);
+    return null;
   }
 }
 
@@ -68,5 +71,6 @@ export async function clearAllWarnings() {
     return res.data;
   } catch (err) {
     logError('Error clearing all warnings', err);
+    return null;
   }
 }
