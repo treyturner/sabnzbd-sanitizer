@@ -8,13 +8,12 @@ export function pluralize(something: any[] | number, suffix = 's'): string {
 
 export async function logError(description: string, err: unknown) {
   console.error(description + ':');
-  try {
-    if (err instanceof Error) {
-      console.error(JSON.stringify(err, null, 2));
-    } else {
-      console.error(err);
-    }
-  } catch {}
+  if (err instanceof Error) {
+    console.error(err.message);
+    if (err.stack) console.error(err.stack);
+  } else {
+    console.error(err);
+  }
 }
 
 export function pad(i: number) {
