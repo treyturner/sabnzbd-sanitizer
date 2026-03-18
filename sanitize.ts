@@ -64,7 +64,7 @@ async function sanitize() {
 async function sanitizeWarnings() {
   const warnings: { text: string }[] = await api.getWarnings();
   let clearedWarnings = false;
-  if (typeof warnings === 'object' && warnings.length) {
+  if (typeof warnings === 'object' && warnings !== null && warnings.length) {
     if (
       config.categories.some((category) =>
         warnings.some(
