@@ -15,10 +15,10 @@ export async function getHistory({
       params: {
         mode: 'history',
         start: start,
-        limit: limit || Number.MAX_SAFE_INTEGER,
+        limit: limit ?? Number.MAX_SAFE_INTEGER,
         cat: cat,
         search: search,
-        nzo_ids: nzoIds?.join() !== '' ? nzoIds?.join() : undefined,
+        nzo_ids: nzoIds?.length ? nzoIds.join() : undefined,
         last_history_update: lastHistoryUpdate || 0,
       },
     });
