@@ -65,15 +65,13 @@ async function sanitizeWarnings() {
   const warnings: { text: string }[] = await api.getWarnings();
   let clearedWarnings = false;
   if (typeof warnings === 'object' && warnings !== null && warnings.length) {
-    if (
-      config.categories.some((category) =>
-        warnings.some(
-          (warning) =>
-            warning.text.toLowerCase().includes(category) ||
-            warning.text.includes('Your UNRAR version is')
-        )
-      )
-    ) {
+    const hasMatchingWarning = config.categories.some((category) =>
+      warnings.some((w) => w.text.toLowerCase().includes(category))
+    );
+    const hasUnrarWarning = warnings.some((w) =>
+      w.text.includes('Your UNRAR version is')
+    );
+    if (hasMatchingWarning || hasUnrarWarning) {
       clearedWarnings = true;
       await api.clearAllWarnings();
       console.log(
