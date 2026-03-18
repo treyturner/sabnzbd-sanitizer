@@ -19,7 +19,7 @@ jobs:
       - name: DockerHub login
         uses: docker/login-action@c144859092e8e353f3e118b0b329679a62351c3e  # v4.0.0
         with:
-          username: ${{ secrets.DOCKERHUB_USERNAME }}
+          username: ${{ vars.DOCKERHUB_USERNAME }}
           password: ${{ secrets.DOCKERHUB_TOKEN }}
 
       - name: GitHub Container Registry login
@@ -42,10 +42,9 @@ jobs:
           context: .
           push: true
           tags: |
-            ${{ secrets.DOCKERHUB_USERNAME }}/${{ env.PROJECT_NAME }}:latest
-            ${{ secrets.DOCKERHUB_USERNAME }}/${{ env.PROJECT_NAME }}:${{ github.run_number }}.${{ github.run_attempt }}
+            ${{ vars.DOCKERHUB_USERNAME }}/${{ env.PROJECT_NAME }}:latest
+            ${{ vars.DOCKERHUB_USERNAME }}/${{ env.PROJECT_NAME }}:${{ github.run_number }}.${{ github.run_attempt }}
             ghcr.io/${{ github.repository_owner }}/${{ env.PROJECT_NAME }}:latest
             ghcr.io/${{ github.repository_owner }}/${{ env.PROJECT_NAME }}:${{ github.run_number }}.${{ github.run_attempt }}
             forgejo.treyturner.info/${{ github.repository_owner }}/${{ env.PROJECT_NAME }}:latest
             forgejo.treyturner.info/${{ github.repository_owner }}/${{ env.PROJECT_NAME }}:${{ github.run_number }}.${{ github.run_attempt }}
-
