@@ -14,7 +14,7 @@ jobs:
       contents: read
       packages: write
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd  # v6.0.2
 
       - name: DockerHub login
         uses: docker/login-action@c144859092e8e353f3e118b0b329679a62351c3e  # v4.0.0
