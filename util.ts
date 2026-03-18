@@ -6,7 +6,7 @@ export function pluralize(something: any[] | number, suffix = 's'): string {
   }
 }
 
-export async function logError(description: string, err: unknown) {
+export function logError(description: string, err: unknown) {
   console.error(description + ':');
   if (err instanceof Error) {
     console.error(err.message);
