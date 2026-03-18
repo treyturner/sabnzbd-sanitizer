@@ -1,6 +1,6 @@
-import * as api from './api';
+import * as api from './api.js';
 import axios from 'axios';
-import { pad, pluralize } from './util';
+import { pad, pluralize } from './util.js';
 
 if (!process.env.CATEGORIES || !process.env.API_URL || !process.env.API_KEY) {
   console.error(
