@@ -94,7 +94,7 @@ async function sanitizeHistory() {
           config.categories.some((c) => i.name.toLowerCase().includes(c)))
       );
     };
-    const items = history.slots.filter((i) => filterFn(i));
+    const items = history.slots.filter(filterFn);
     if (items.length) {
       const result = await api.removeHistoryItems(items);
       if (result) {
